@@ -7,8 +7,8 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = () => {
   const config = {};
 
-  config.mode = 'development';
-  config.devtool = 'inline-source-map';
+  // config.mode = 'development';
+  // config.devtool = 'inline-source-map';
 
   config.entry = {
     app: './app.js'
