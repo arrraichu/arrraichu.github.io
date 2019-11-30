@@ -17,15 +17,10 @@ class App extends Component {
 
   render() {
     const { match, location, history } = this.props;
-    console.log('PROPS:', this.props);
+    // console.log('PROPS:', this.props);
 
     return (
-      <Header aria-label="raymchu">
-        <SkipToContent />
-        <HeaderName href="/" prefix="">
-          raymchu
-        </HeaderName>
-      </Header>
+      <h1>come back later</h1>
     );
   }
 };

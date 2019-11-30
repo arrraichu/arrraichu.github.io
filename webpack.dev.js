@@ -10,6 +10,9 @@ module.exports = () => {
   // config.mode = 'development';
   // config.devtool = 'inline-source-map';
 
+  config.mode = 'production';
+  config.devtool = 'none';
+
   config.entry = {
     app: './app.js'
   };

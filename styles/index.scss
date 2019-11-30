@@ -5,11 +5,23 @@ $feature-flags: (
 );
 
 @import '~@carbon/themes/scss/themes';
+@import './custom-theme';
 
-$carbon--theme: $carbon--theme--g10;
+$carbon--theme: $carbon--theme--custom;
 @include carbon--theme();
 
 html {
   background: $ui-background;
+}
+
+body {
+  background: transparent;
   color: $ui-01;
+  padding: 3rem;
+}
+
+h1 {
+  font-size: 5rem;
+  font-weight: 900;
+  line-height: 4.5rem;
 }
