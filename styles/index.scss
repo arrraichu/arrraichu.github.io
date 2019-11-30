@@ -1,0 +1,15 @@
+@import '~carbon-components/scss/globals/scss/styles.scss';
+
+$feature-flags: (
+  ui-shell: true
+);
+
+@import '~@carbon/themes/scss/themes';
+
+$carbon--theme: $carbon--theme--g10;
+@include carbon--theme();
+
+html {
+  background: $ui-background;
+  color: $ui-01;
+}
