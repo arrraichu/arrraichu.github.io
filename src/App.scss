@@ -63,3 +63,14 @@
     }
   }
 }
+
+@media only screen and (max-width: 300px) {
+  .App {
+    &__bordered-horizontal-content {
+      &--title {
+        @include type.type-style('heading-03');
+        overflow: hidden;
+      }
+    }
+  }
+}
