@@ -1,0 +1,77 @@
+@use '@carbon/react/scss/spacing';
+@use '@carbon/type';
+
+.App {
+  padding: spacing.$spacing-05 spacing.$spacing-05;
+
+  &__center-container {
+    margin: spacing.$spacing-05 0;
+    padding: spacing.$spacing-03 0;
+
+    display: flex;
+    justify-content: center;
+
+    .header {
+      padding: spacing.$spacing-05 0;
+      font-weight: bold;
+    }
+
+    .noter {
+      font-style: italic;
+    }
+
+    .cds--btn--primary {
+      border-radius: spacing.$spacing-02;
+      padding-left: spacing.$spacing-06;
+      padding-right: spacing.$spacing-06;
+    }
+
+    .cds--form-item {
+      flex: 0 0 auto; // do NOT take the whole width length
+    }
+  }
+
+  &__bordered-horizontal-content {
+    margin: spacing.$spacing-07 auto;
+    padding: spacing.$spacing-05 spacing.$spacing-06;
+
+    max-width: 10 * spacing.$spacing-13;
+
+    align-items: flex-end;
+    display: flex;
+    flex-wrap: wrap;
+
+    border: spacing.$spacing-02 solid #e5e5e5;
+    border-radius: spacing.$spacing-02;
+
+    &--title {
+      @include type.type-style('heading-04');
+      font-weight: bold;
+      padding-right: spacing.$spacing-05;
+    }
+
+    &--body {
+      @include type.type-style('heading-02');
+      font-weight: lighter;
+    }
+
+    .cds--tag {
+      margin-right: spacing.$spacing-04;
+    }
+  }
+
+  &__bordered-split-content {
+    margin: spacing.$spacing-07 auto;
+    padding: spacing.$spacing-05 spacing.$spacing-06;
+
+    max-width: 10 * spacing.$spacing-13;
+
+    border: spacing.$spacing-02 solid #e5e5e5;
+    border-radius: spacing.$spacing-02;
+
+    &--title {
+      @include type.type-style('heading-04');
+      font-weight: bold;
+    }
+  }
+}
