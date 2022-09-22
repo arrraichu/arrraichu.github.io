@@ -53,26 +53,12 @@
     &--body {
       @include type.type-style('heading-02');
       font-weight: lighter;
+      margin-top: spacing.$spacing-02;
     }
 
     .cds--tag {
       margin-right: spacing.$spacing-04;
       margin-top: spacing.$spacing-04;
-    }
-  }
-
-  &__bordered-split-content {
-    margin: spacing.$spacing-07 auto;
-    padding: spacing.$spacing-05 spacing.$spacing-06;
-
-    max-width: 10 * spacing.$spacing-13;
-
-    border: spacing.$spacing-02 solid #e5e5e5;
-    border-radius: spacing.$spacing-02;
-
-    &--title {
-      @include type.type-style('heading-04');
-      font-weight: bold;
     }
   }
 }
