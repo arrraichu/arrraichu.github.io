@@ -1,8 +1,9 @@
 import {
-	HEROES,
-	VILLAIN_GROUPS,
+	BYSTANDERS,
 	HENCHMEN_GROUPS,
-	BYSTANDERS
+	HEROES,
+	MASTER_STRIKE,
+	VILLAIN_GROUPS
 } from './index';
 
 export const PlayerRequirements = {
@@ -10,30 +11,35 @@ export const PlayerRequirements = {
 		[HEROES]: 3,
 		[VILLAIN_GROUPS]: 1,
 		[HENCHMEN_GROUPS]: 1,
-		[BYSTANDERS]: 1
+		[BYSTANDERS]: 1,
+		[MASTER_STRIKE]: 1
 	},
 	2: {
 		[HEROES]: 5,
 		[VILLAIN_GROUPS]: 2,
 		[HENCHMEN_GROUPS]: 1,
-		[BYSTANDERS]: 2
+		[BYSTANDERS]: 2,
+		[MASTER_STRIKE]: 5
 	},
 	3: {
 		[HEROES]: 5,
 		[VILLAIN_GROUPS]: 3,
 		[HENCHMEN_GROUPS]: 1,
-		[BYSTANDERS]: 8
+		[BYSTANDERS]: 8,
+		[MASTER_STRIKE]: 5
 	},
 	4: {
 		[HEROES]: 5,
 		[VILLAIN_GROUPS]: 3,
 		[HENCHMEN_GROUPS]: 2,
-		[BYSTANDERS]: 8
+		[BYSTANDERS]: 8,
+		[MASTER_STRIKE]: 5
 	},
 	5: {
 		[HEROES]: 6,
 		[VILLAIN_GROUPS]: 4,
 		[HENCHMEN_GROUPS]: 2,
-		[BYSTANDERS]: 12
+		[BYSTANDERS]: 12,
+		[MASTER_STRIKE]: 5
 	}
 };
