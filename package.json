@@ -38,6 +38,7 @@
     "@carbon/type": "^11.9.0",
     "@reduxjs/toolkit": "^1.8.5",
     "customize-cra": "^1.0.0",
+    "deep-freeze": "^0.0.1",
     "lodash": "^4.17.21",
     "react-app-rewired": "^2.2.1",
     "react-redux": "^8.0.2",

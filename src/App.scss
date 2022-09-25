@@ -4,6 +4,11 @@
 .App {
   padding: spacing.$spacing-05 spacing.$spacing-05;
 
+  .checkbox-list {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
   &__center-container {
     margin: spacing.$spacing-05 0;
     padding: spacing.$spacing-03 0;
@@ -29,6 +34,15 @@
 
     .cds--form-item {
       flex: 0 0 auto; // do NOT take the whole width length
+      padding: 0 spacing.$spacing-03;
+    }
+
+    .cds--form-item.cds--checkbox-wrapper:first-of-type {
+      margin-top: 0;
+    }
+
+    .cds--form-item.cds--checkbox-wrapper:last-of-type {
+      margin-bottom: 0;
     }
   }
 

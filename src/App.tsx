@@ -5,35 +5,44 @@ import {
   SelectItem,
   Tag
 } from '@carbon/react';
-import _ from 'lodash';
 import { useCallback, useState } from 'react';
 import {
-  ALWAYS_LEADS,
-  BYSTANDERS,
-  HENCHMEN_GROUPS,
-  HEROES,
-  MASTER_STRIKE,
-  NO_SINGLE_PLAYER,
-  REQUIRED,
-  SCHEME_TWIST,
-  VILLAIN_GROUPS
+  SETS,
+  Henchman,
+  Hero,
+  Mastermind,
+  Scheme,
+  Villain
 } from './constants';
-import { PlayerRequirements } from './constants/requirements';
-import { Heroes, Villains, Henchmen, Masterminds, Schemes } from './constants/sets/core';
+import {
+  getHenchmen,
+  getHeroes,
+  getMastermind,
+  getNumBystanders,
+  getNumMasterStrikes,
+  getNumSchemeTwists,
+  getScheme,
+  getVillains,
+  manageSpecialCases
+} from './constants/utils';
 
 import './App.scss';
 
 function App() {
+  const [additionalSets, setAdditionalSets] = useState<{ [k: string]: boolean }>({});
   const [numPlayers, setNumPlayers] = useState<number>(1);
-  const [mastermind, setMastermind] = useState<string>('');
-  const [scheme, setScheme] = useState<string>('');
-  const [heroes, setHeroes] = useState<string[]>([]);
-  const [villains, setVillains] = useState<string[]>([]);
+  const [mastermind, setMastermind] = useState<Mastermind | undefined>(undefined);
+  const [scheme, setScheme] = useState<Scheme | undefined>(undefined);
+  const [heroes, setHeroes] = useState<Hero[]>([]);
+  const [villains, setVillains] = useState<Villain[]>([]);
+  const [henchmen, setHenchmen] = useState<Henchman[]>([]);
   const [numberOfBystanders, setNumberOfBystanders] = useState<number>(0);
   const [numberOfTwists, setNumberOfTwists] = useState<number>(0);
   const [numberOfStrikes, setNumberOfStrikes] = useState<number>(0);
 
-  const sanitizeString = s => s !== '' ? s : '???';
+  const [additionalHeroes, setAdditionalHeroes] = useState<string[]>([]);
+  const [additionalVillains, setAdditionalVillains] = useState<string[]>([]);
+  const [otherCards, setOtherCards] = useState<string[]>([]);
 
   const onSetNumPlayers = useCallback(
     event => {
@@ -42,136 +51,58 @@ function App() {
     [setNumPlayers]
   );
 
+  const toggleAdditionalSet = useCallback(
+    setName => {
+      const activeSets = { ...additionalSets };
+      const enabled = activeSets[setName] ?? false;
+      activeSets[setName] = !enabled;
+
+      setAdditionalSets(activeSets);
+    },
+    [
+      additionalSets,
+      setAdditionalSets
+    ]
+  );
+
   const generateGame = useCallback(
     () => {
-      const filteredSchemes = _.cloneDeep(Schemes);
-      if (numPlayers === 1) {
-        for (const key of Object.keys(filteredSchemes)) {
-          if (filteredSchemes[key][NO_SINGLE_PLAYER] === true) {
-            delete filteredSchemes[key];
-          }
-        }
-      }
+      const usingSets = Object.keys(additionalSets).filter(s => !!additionalSets[s]) as SETS[];
 
-      const numSchemes = 
-        Object.keys(filteredSchemes).length;
-      const schemeIndex = Math.floor(Math.random() * numSchemes);
-      const theScheme = Object.keys(filteredSchemes)[schemeIndex]
+      const theScheme = getScheme(usingSets, numPlayers);
+      const theMastermind = getMastermind(usingSets);
+      const { heroes: theHeroes, remaining: remainingHeroes } = getHeroes(usingSets, numPlayers, theScheme);
+      const { villains: theVillains, remaining: remainingVillains } = getVillains(usingSets, numPlayers, theScheme, theMastermind);
+      const { henchmen: theHenchmen, remaining: remainingHenchmen } = getHenchmen(usingSets, numPlayers, theScheme, theMastermind);
+      const numBystanders = getNumBystanders(numPlayers, theScheme);
+      const numTwists = getNumSchemeTwists(numPlayers, theScheme);
+      const numStrikes = getNumMasterStrikes(numPlayers);
+
+      const { heroes: addHeroes, villains: addVillains, other: addOther } = manageSpecialCases(
+        usingSets,
+        numPlayers,
+        theScheme,
+        theMastermind,
+        remainingHeroes,
+        remainingVillains,
+        remainingHenchmen
+      );
+
       setScheme(theScheme);
-      const schemeProps = Schemes[theScheme];
-
-      const numMasterminds = Object.keys(Masterminds).length;
-      const mastermindIndex = Math.floor(Math.random() * numMasterminds);
-      const theMastermind = Object.keys(Masterminds)[mastermindIndex]
       setMastermind(theMastermind);
-      const mastermindProps = Masterminds[theMastermind];
-
-      let numHeroes = PlayerRequirements[numPlayers][HEROES];
-      if (schemeProps[HEROES]) {
-        numHeroes = schemeProps[HEROES](numHeroes, numPlayers);
-      }
-
-      let numVillains = PlayerRequirements[numPlayers][VILLAIN_GROUPS];
-      if (schemeProps[VILLAIN_GROUPS]) {
-        numVillains = schemeProps[VILLAIN_GROUPS](numVillains, numPlayers);
-      }
-
-      let numHenchmen = PlayerRequirements[numPlayers][HENCHMEN_GROUPS];
-      if (schemeProps[HENCHMEN_GROUPS]) {
-        numHenchmen = schemeProps[HENCHMEN_GROUPS](numHenchmen, numPlayers);
-      }
-
-      let numBystanders = PlayerRequirements[numPlayers][BYSTANDERS];
-      if (schemeProps[BYSTANDERS]) {
-        numBystanders = schemeProps[BYSTANDERS](numBystanders, numPlayers);
-      }
-
-      const numTwists = schemeProps[SCHEME_TWIST]();
-
-      const numStrikes = PlayerRequirements[numPlayers][MASTER_STRIKE];
-
-      const theHeroes : string[] = [];
-      const remainingHeroes = _.cloneDeep(Heroes);
-
-      const theVillains : string[] = [];
-      const remainingVillains = _.cloneDeep(Villains);
-
-      const theHenchmen : string[] = [];
-      const remainingHenchmen = _.cloneDeep(Henchmen);
-
-      const schemeRequirement = schemeProps[REQUIRED];
-      if (!_.isEmpty(schemeRequirement)) {
-        if (!_.isEmpty(schemeRequirement[HEROES])) {
-          for (const theHero of schemeRequirement[HEROES]) {
-            theHeroes.push(theHero);
-            delete remainingHeroes[theHero];
-            numHeroes = numHeroes - 1;
-          }
-        } else if (!_.isEmpty(schemeRequirement[VILLAIN_GROUPS])) {
-          for (const theVillain of schemeRequirement[VILLAIN_GROUPS]) {
-            theVillains.push(theVillain);
-            delete remainingVillains[theVillain];
-            numVillains = numVillains - 1;
-          }
-        } else if (!_.isEmpty(schemeRequirement[HENCHMEN_GROUPS])) {
-          for (const theHenchman of schemeRequirement[HENCHMEN_GROUPS]) {
-            theHenchmen.push(theHenchman);
-            delete remainingHenchmen[theHenchman];
-            numHenchmen = numHenchmen - 1;
-          }
-        }
-      }
-
-      const alwaysLeads = mastermindProps[ALWAYS_LEADS];
-      if (Object.keys(Villains).includes(alwaysLeads)) {
-        theVillains.push(alwaysLeads);
-        delete remainingVillains[alwaysLeads];
-        numVillains = numVillains - 1;
-      } else if (Object.keys(Henchmen).includes(alwaysLeads)) {
-        theHenchmen.push(alwaysLeads);
-        delete remainingHenchmen[alwaysLeads];
-        numHenchmen = numHenchmen - 1;
-      }
-
-      while (numHeroes > 0) {
-        const numRemainingHeroes = Object.keys(remainingHeroes).length;
-        const heroIndex = Math.floor(Math.random() * numRemainingHeroes);
-        const theHero = Object.keys(remainingHeroes)[heroIndex];
-
-        theHeroes.push(theHero);
-        delete remainingHeroes[theHero];
-        numHeroes = numHeroes - 1;
-      }
       setHeroes(theHeroes);
-
-      while (numVillains > 0) {
-        const numRemainingVillains = Object.keys(remainingVillains).length;
-        const villainIndex = Math.floor(Math.random() * numRemainingVillains);
-        const theVillain = Object.keys(remainingVillains)[villainIndex];
-
-        theVillains.push(theVillain);
-        delete remainingVillains[theVillain];
-        numVillains = numVillains - 1;
-      }
-
-      while (numHenchmen > 0) {
-        const numRemainingHenchmen = Object.keys(remainingHenchmen).length;
-        const henchmanIndex = Math.floor(Math.random() * numRemainingHenchmen);
-        const theHenchman = Object.keys(remainingHenchmen)[henchmanIndex];
-
-        theHenchmen.push(theHenchman);
-        delete remainingHenchmen[theHenchman];
-        numHenchmen = numHenchmen - 1;
-      }
-
-      const allVillains = [ ...theVillains, ...theHenchmen.map(h => `Henchmen: ${h}`)];
-      setVillains(allVillains);
-
+      setVillains(theVillains);
+      setHenchmen(theHenchmen);
       setNumberOfBystanders(numBystanders);
       setNumberOfTwists(numTwists);
       setNumberOfStrikes(numStrikes);
+
+      setAdditionalHeroes(addHeroes);
+      setAdditionalVillains(addVillains);
+      setOtherCards(addOther);
     },
     [
+      additionalSets,
       numPlayers,
       setHeroes,
       setMastermind,
@@ -188,8 +119,18 @@ function App() {
         </h1>
       </div>
 
-      <div className="App__center-container">
+      <div className="App__center-container checkbox-list">
         <Checkbox id="core-set" checked disabled labelText="Core set (default)" />
+        {Object.values(SETS).filter(set => set !== SETS.CORE).map(set => {
+          return (
+            <Checkbox
+              key={set.toLowerCase()}
+              id={set.toLowerCase().replace(' ', '-')}
+              labelText={set}
+              enabled={(additionalSets[set] ?? false).toString()}
+              onClick={() => toggleAdditionalSet(set)}/>
+          );
+        })}
       </div>
 
       <div className="App__center-container num-players">
@@ -200,11 +141,11 @@ function App() {
           labelText="Number of players"
           inline
           onChange={onSetNumPlayers}>
-          <SelectItem text="1" value="1" />
-          <SelectItem text="2" value="2" />
-          <SelectItem text="3" value="3" />
-          <SelectItem text="4" value="4" />
-          <SelectItem text="5" value="5" />
+          {[1, 2, 3, 4, 5].map((item) => {
+            return (
+              <SelectItem key={`select-${item.toString()}-players`} text={item.toString()} value={item.toString()} />
+            );
+          })}
         </Select>
       </div>
 
@@ -216,19 +157,24 @@ function App() {
 
       <div className="App__bordered-horizontal-content">
         <div className="App__bordered-horizontal-content--title">Mastermind</div>
-        <div className="App__bordered-horizontal-content--body">{sanitizeString(mastermind)}</div>
+        <div className="App__bordered-horizontal-content--body">{mastermind ? mastermind.mastermind ?? '???' : '???'}</div>
       </div>
 
       <div className="App__bordered-horizontal-content">
         <div className="App__bordered-horizontal-content--title">Scheme</div>
-        <div className="App__bordered-horizontal-content--body">{sanitizeString(scheme)}</div>
+        <div className="App__bordered-horizontal-content--body">{scheme ? scheme.scheme ?? '???' : '???'}</div>
       </div>
 
       <div className="App__bordered-horizontal-content">
         <div className="App__bordered-horizontal-content--title">Hero Deck</div>
         {heroes.map((hero, index) => {
           return (
-            <Tag key={`hero-${index}`} className="App__bordered-horizontal-content--body" type="cool-gray">{hero}</Tag>
+            <Tag key={`hero-${index}`} className="App__bordered-horizontal-content--body" type="cool-gray">{hero.hero}</Tag>
+          );
+        })}
+        {additionalHeroes.map((hero, index) => {
+          return (
+            <Tag key={`add-hero-${index}`} className="App__bordered-horizontal-content--body" type="cool-gray">{hero}</Tag>
           );
         })}
       </div>
@@ -237,7 +183,12 @@ function App() {
         <div className="App__bordered-horizontal-content--title">Villain Deck</div>
         {villains.map((villain, index) => {
           return (
-            <Tag key={`villain-${index}`} className="App__bordered-horizontal-content--body" type="cool-gray">{villain}</Tag>
+            <Tag key={`villain-${index}`} className="App__bordered-horizontal-content--body" type="cool-gray">{villain.villain}</Tag>
+          );
+        })}
+        {henchmen.map((henchman, index) => {
+          return (
+            <Tag key={`henchman-${index}`} className="App__bordered-horizontal-content--body" type="cool-gray">{`Henchman: ${henchman.henchman}`}</Tag>
           );
         })}
         {numberOfTwists > 0 ?
@@ -251,8 +202,23 @@ function App() {
         {numberOfBystanders > 0 ?
           <Tag key="bystanders" className="App__bordered-horizontal-content--body" type="cool-gray">{`Bystanders x ${numberOfBystanders}`}</Tag>
           : <></>
-        }       
+        }
+        {additionalVillains.map((villain, index) => {
+          return (
+            <Tag key={`add-villain-${index}`} className="App__bordered-horizontal-content--body" type="cool-gray">{villain}</Tag>
+          );
+        })}      
       </div>
+      {otherCards.length === 0 ? <></> :
+        <div className="App__bordered-horizontal-content">
+          <div className="App__bordered-horizontal-content--title">Other Cards</div>
+          {otherCards.map((name, index) => {
+            return (
+              <Tag key={`other-card-${index}`} className="App__bordered-horizontal-content--body" type="cool-gray">{name}</Tag>
+            );
+          })}
+        </div>
+      }
     </div>
   );
 }
