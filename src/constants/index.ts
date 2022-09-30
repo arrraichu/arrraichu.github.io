@@ -13,7 +13,7 @@ export const SCHEME_TWIST = 'Scheme Twist';
 export const WOUND = 'Wound';
 
 export enum SETS {
-	CORE = 'Core Set',
+	CORE = 'Core Set (default)',
 	SECRET_WARS = 'Secret Wars'
 };
 

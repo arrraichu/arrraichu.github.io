@@ -44,10 +44,13 @@ import {
 	manageSpecialCases as manageSecretWarsSpecialCases
 } from './sets/secret-wars';
 
-export const getMastermind = (additionalSets: SETS[]): Mastermind => {
-	const masterminds: MastermindDefinition = { ...CoreMasterminds };
+export const getMastermind = (usingSets: SETS[]): Mastermind => {
+	const masterminds: MastermindDefinition = {};
 
-	if (additionalSets.includes(SETS.SECRET_WARS)) {
+	if (usingSets.includes(SETS.CORE)) {
+		_.extend(masterminds, CoreMasterminds);
+	}
+	if (usingSets.includes(SETS.SECRET_WARS)) {
 		_.extend(masterminds, SecretWarsMasterminds);
 	}
 
@@ -64,10 +67,13 @@ export const getMastermind = (additionalSets: SETS[]): Mastermind => {
 	};
 };
 
-export const getScheme = (additionalSets: SETS[], numPlayers: number): Scheme => {
-	const schemes: SchemeDefinition = { ...CoreSchemes };
+export const getScheme = (usingSets: SETS[], numPlayers: number): Scheme => {
+	const schemes: SchemeDefinition = {};
 
-	if (additionalSets.includes(SETS.SECRET_WARS)) {
+	if (usingSets.includes(SETS.CORE)) {
+		_.extend(schemes, CoreSchemes);
+	}
+	if (usingSets.includes(SETS.SECRET_WARS)) {
 		_.extend(schemes, SecretWarsSchemes);
 	}
 
@@ -93,13 +99,16 @@ export const getScheme = (additionalSets: SETS[], numPlayers: number): Scheme =>
 };
 
 export const getHeroes = (
-	additionalSets: SETS[],
+	usingSets: SETS[],
 	numPlayers: number,
 	scheme: Scheme
 ): HeroStack => {
-	const heroes: HeroDefinition = { ...CoreHeroes };
+	const heroes: HeroDefinition = {};
 
-	if (additionalSets.includes(SETS.SECRET_WARS)) {
+	if (usingSets.includes(SETS.CORE)) {
+		_.extend(heroes, CoreHeroes);
+	}
+	if (usingSets.includes(SETS.SECRET_WARS)) {
 		_.extend(heroes, SecretWarsHeroes);
 	}
 
@@ -139,14 +148,17 @@ export const getHeroes = (
 };
 
 export const getVillains = (
-	additionalSets: SETS[],
+	usingSets: SETS[],
 	numPlayers: number,
 	scheme: Scheme,
 	mastermind: Mastermind
 ): VillainStack => {
-	const villains: VillainDefinition = { ...CoreVillains };
+	const villains: VillainDefinition = {};
 
-	if (additionalSets.includes(SETS.SECRET_WARS)) {
+	if (usingSets.includes(SETS.CORE)) {
+		_.extend(villains, CoreVillains);
+	}
+	if (usingSets.includes(SETS.SECRET_WARS)) {
 		_.extend(villains, SecretWarsVillains);
 	}
 
@@ -197,14 +209,17 @@ export const getVillains = (
 };
 
 export const getHenchmen = (
-	additionalSets: SETS[],
+	usingSets: SETS[],
 	numPlayers: number,
 	scheme: Scheme,
 	mastermind: Mastermind
 ): HenchmanStack => {
-	const henchmen: HenchmanDefinition = { ...CoreHenchmen };
+	const henchmen: HenchmanDefinition = {};
 
-	if (additionalSets.includes(SETS.SECRET_WARS)) {
+	if (usingSets.includes(SETS.CORE)) {
+		_.extend(henchmen, CoreHenchmen);
+	}
+	if (usingSets.includes(SETS.SECRET_WARS)) {
 		_.extend(henchmen, SecretWarsHenchmen);
 	}
 
@@ -279,7 +294,7 @@ export const getNumMasterStrikes = (numPlayers: number) => {
 }
 
 export const manageSpecialCases = (
-	additionalSets: SETS[],
+	usingSets: SETS[],
 	numPlayers: number,
 	scheme: Scheme,
 	mastermind: Mastermind,
@@ -295,7 +310,7 @@ export const manageSpecialCases = (
 
 	if (Object.keys(SecretWarsSchemes).includes(scheme.scheme)) {
 		const cases = manageSecretWarsSpecialCases(
-			additionalSets,
+			usingSets,
 			numPlayers,
 			scheme,
 			mastermind,

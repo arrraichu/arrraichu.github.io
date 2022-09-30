@@ -28,8 +28,16 @@ import {
 
 import './App.scss';
 
+type ActiveSets = {
+  [setName: string]: boolean;
+};
+
+const DEFAULT_STARTING_SET = {
+  [SETS.CORE]: true
+};
+
 function App() {
-  const [additionalSets, setAdditionalSets] = useState<{ [k: string]: boolean }>({});
+  const [activeSets, setActiveSets] = useState<ActiveSets>(DEFAULT_STARTING_SET);
   const [numPlayers, setNumPlayers] = useState<number>(1);
   const [mastermind, setMastermind] = useState<Mastermind | undefined>(undefined);
   const [scheme, setScheme] = useState<Scheme | undefined>(undefined);
@@ -53,21 +61,37 @@ function App() {
 
   const toggleAdditionalSet = useCallback(
     setName => {
-      const activeSets = { ...additionalSets };
-      const enabled = activeSets[setName] ?? false;
-      activeSets[setName] = !enabled;
+      const theActiveSets = { ...activeSets };
+      const enabled = theActiveSets[setName] ?? false;
+      theActiveSets[setName] = !enabled;
 
-      setAdditionalSets(activeSets);
+      setActiveSets(theActiveSets);
     },
     [
-      additionalSets,
-      setAdditionalSets
+      activeSets,
+      setActiveSets
     ]
   );
 
   const generateGame = useCallback(
     () => {
-      const usingSets = Object.keys(additionalSets).filter(s => !!additionalSets[s]) as SETS[];
+      const usingSets = Object.keys(activeSets).filter(s => !!activeSets[s]) as SETS[];
+      if (usingSets.length === 0) {
+        setNumPlayers(1);
+        setMastermind(undefined);
+        setScheme(undefined);
+        setHeroes([]);
+        setVillains([]);
+        setHenchmen([]);
+        setNumberOfBystanders(0);
+        setNumberOfTwists(0);
+        setNumberOfStrikes(0);
+        setAdditionalHeroes([]);
+        setAdditionalVillains([]);
+        setOtherCards([]);
+
+        return;
+      }
 
       const theScheme = getScheme(usingSets, numPlayers);
       const theMastermind = getMastermind(usingSets);
@@ -102,7 +126,7 @@ function App() {
       setOtherCards(addOther);
     },
     [
-      additionalSets,
+      activeSets,
       numPlayers,
       setHeroes,
       setMastermind,
@@ -120,14 +144,13 @@ function App() {
       </div>
 
       <div className="App__center-container checkbox-list">
-        <Checkbox id="core-set" checked disabled labelText="Core set (default)" />
-        {Object.values(SETS).filter(set => set !== SETS.CORE).map(set => {
+        {Object.values(SETS).map(set => {
           return (
             <Checkbox
               key={set.toLowerCase()}
               id={set.toLowerCase().replace(' ', '-')}
               labelText={set}
-              enabled={(additionalSets[set] ?? false).toString()}
+              checked={activeSets[set] === true}
               onClick={() => toggleAdditionalSet(set)}/>
           );
         })}
